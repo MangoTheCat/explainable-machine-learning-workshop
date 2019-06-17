@@ -8,5 +8,5 @@ To follow along with the workshop you will need a laptop with the following soft
 Install the following R packages from CRAN:
 
 ```r
-install.packages(c("DALEX", "randomForest", "lime", "caret", "iml", "arules"))
+install.packages(c("DALEX", "randomForest", "ggplot2", "lime", "caret", "iml", "arules"))
 ```
