@@ -9,4 +9,5 @@ Install the following R packages from CRAN:
 
 ```r
 install.packages(c("DALEX", "randomForest", "ggplot2", "lime", "caret", "iml", "arules"))
+DALEX::install_dependencies()
 ```
