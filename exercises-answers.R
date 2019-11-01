@@ -47,6 +47,13 @@ ggplot(mp_rf,
   ggtitle("Diagnostic plot") + 
   theme_mi2()
 
+ggplot(mp_rf, aes(observed, diff) ) +
+  stat_density_2d(aes(fill = ..level..), geom = "polygon", colour = "white") +
+  scale_fill_gradient(name = "density") +
+  xlab("Observed") + 
+  ylab("Predicted - Observed") + 
+  ggtitle("Diagnostic plot") + 
+  theme_mi2()
 
 # Extract and compare models’ variable importance. 
 # How are they similar? How are they different?
@@ -61,13 +68,15 @@ plot(vi_rf, vi_lm)
 # Explore height in both models using Partial Dependency Plots. 
 # What are the differences and why?
 
-sv_rf  <- single_variable(explainer_rf, 
-                          variable = "height", 
-                          type = "pdp")
-sv_lm  <- single_variable(explainer_lm, 
-                          variable = "height", 
-                          type = "pdp")
-plot(sv_rf, sv_lm)
+pdp_rf <- ingredients::partial_dependency(
+  explainer_rf, variables = "height", 
+  variable_type = "numerical")
+
+pdp_lm <- ingredients::partial_dependency(
+  explainer_lm, variables = "height", 
+  variable_type = "numerical")
+
+plot(pdp_rf, pdp_lm)
 
 # Select the top outlier from the Random Forest model and understand the 
 # composition of its prediction in both linear and random forest models. 

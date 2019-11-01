@@ -81,9 +81,9 @@ plot(mp_lm, mp_rf, geom = "boxplot")
 # mp object contains predicted, observed, diff (=residuals)
 str(mp_rf)
 
-ggplot(mp_rf, 
-       aes(observed, diff)) +
-  geom_point() + 
+ggplot(mp_rf, aes(observed, diff) ) +
+  stat_density_2d(aes(fill = ..level..), geom = "polygon", colour = "white") +
+  scale_fill_gradient(name = "density") +
   xlab("Observed") + 
   ylab("Predicted - Observed") + 
   ggtitle("Diagnostic plot") + 
@@ -92,6 +92,14 @@ ggplot(mp_rf,
 
 # Same for LM shows two groups of residuals! --> reason for bumps in inverse cdf!
 # due to effect of construction.year being non-linear?
+
+ggplot(mp_lm, aes(observed, diff) ) +
+  stat_density_2d(aes(fill = ..level..), geom = "polygon", colour = "white") +
+  scale_fill_gradient(name = "density") +
+  xlab("Observed") + 
+  ylab("Predicted - Observed") + 
+  ggtitle("Diagnostic plot") + 
+  theme_mi2()
 
 # ~~~~~~~~ exercise ~~~~~~~~
 
@@ -128,16 +136,25 @@ plot(vi_rf, vi_lm)
 # - show marginal effect of a feature on the predicted response
 # - can show form of relationship: linear? non-linear? monotonous?
 
-sv_rf  <- single_variable(explainer_rf, 
-                          variable = "construction.year", 
-                          type = "pdp")
-sv_lm  <- single_variable(explainer_lm, 
-                          variable = "construction.year", 
-                          type = "pdp")
-plot(sv_rf, sv_lm)
+pdp_rf <- ingredients::partial_dependency(
+  explainer_rf, variables = "construction.year", 
+  variable_type = "numerical")
 
+pdp_lm <- ingredients::partial_dependency(
+  explainer_lm, variables = "construction.year", 
+  variable_type = "numerical")
+
+plot(pdp_rf, pdp_lm)
+
+# all variables of the same type
+pdp_rf <- ingredients::partial_dependency(explainer_rf, variables = NULL, variable_type = "numerical")
+plot(pdp_rf)
 # effect of number of rooms ("no.rooms") is also more sigmoid than linear
 
+# take look on the training data
+ggplot(apartments, aes(x = construction.year, y=m2.price) ) +
+  stat_density_2d(aes(fill = ..level..), geom = "polygon", colour = "white") +
+  scale_fill_gradient(name = "density" )
 
 # dalex: How does the model work? > Categorical variable ------------------
 
@@ -161,6 +178,16 @@ svd_lm  <- single_variable(explainer_lm,
                            type = "factor")
 plot(svd_rf, svd_lm)
 
+# suggested new function produces a different type of plot
+ad_rf <- ingredients::accumulated_dependency(
+  explainer_rf, variables = "district", 
+  variable_type = "categorical")
+
+ad_lm <- ingredients::accumulated_dependency(
+  explainer_lm, variables = "district", 
+  variable_type = "categorical")
+
+plot(ad_rf, ad_lm)
 
 
 # ~~~~~~~~ exercise ~~~~~~~~
@@ -200,7 +227,7 @@ explanation <- explain(iris_explain,
                        feature_select = "auto")
 # explore explanations
 explanation
-head(eexplanation)
+head(explanation)
 View(explanation)
 
 # plot explanations
